@@ -135,7 +135,7 @@ func (p *Session) Valid() (bool, error) {
 		if !valid {
 			return false, jwt.NewValidationError(fmt.Sprintf("caa counter faild %d+%d=%d", p.GetCliams().CAA, int64(p.opts.MaxActive), cp), jwt.ValidationErrorMalformed)
 		}
-
+		fmt.Printf("caa timecounterout ok %d+%d=%d\n", p.GetCliams().CAA, int64(p.opts.MaxActive), cp)
 		return valid, nil
 	}
 
@@ -150,6 +150,8 @@ func (p *Session) Valid() (bool, error) {
 	if !valid {
 		return false, jwt.NewValidationError(fmt.Sprintf("caa timeout faild %d+%d=%d", p.GetCliams().CAA, int64(p.opts.MaxAge)*86400, cp), jwt.ValidationErrorMalformed)
 	}
+
+	fmt.Printf("caa timeout ok %d+%d=%d\n", p.GetCliams().CAA, int64(p.opts.MaxAge)*86400, cp)
 	return valid, nil
 }
 
