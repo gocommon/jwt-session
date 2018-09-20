@@ -182,24 +182,14 @@ func (p *Session) SignedString() (string, error) {
 
 		cp := Timeout(c)
 
-		// 是否首次分配
-		hasFirstIssued := !cp.HasIssued()
-
-		issueUnix := cp.Issue()
-
-		if hasFirstIssued && p.opts.MinNight.True() {
-			t := time.Unix(int64(issueUnix), 0)
-			issueUnix = SessionCAA(MinNight(t).Unix())
-		}
-
 		// timout 首次分配时更新就行
-		if hasFirstIssued {
+		if !cp.HasIssued() {
 			defer func() {
-				err = p.store.SetTimeout(p.Author().ID, int64(issueUnix))
+				err = p.store.SetTimeout(p.Author().ID, int64(cp))
 			}()
 		}
 
-		p.GetCliams().SetCAA(issueUnix)
+		p.GetCliams().SetCAA(cp.Issue())
 
 	}
 
