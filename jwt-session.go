@@ -6,7 +6,6 @@ import (
 	"time"
 
 	jwt "github.com/dgrijalva/jwt-go"
-	"github.com/endiangroup/compandauth"
 )
 
 // Author Author
@@ -19,7 +18,7 @@ type Author struct {
 type SessionClaims struct {
 	Author  Author
 	CAAType CAAType
-	CAA     compandauth.SessionCAA // 记录有效用户序号
+	CAA     SessionCAA             // 记录有效用户序号
 	Verify  map[string]interface{} // 验证数据，默认存ip,host
 	Data    map[string]interface{} // 用户自定义数据
 	jwt.StandardClaims
@@ -62,7 +61,7 @@ func (p *SessionClaims) SetVerify(key string, value interface{}) *SessionClaims 
 }
 
 // SetCAA SetCAA
-func (p *SessionClaims) SetCAA(caa compandauth.SessionCAA) *SessionClaims {
+func (p *SessionClaims) SetCAA(caa SessionCAA) *SessionClaims {
 	p.CAA = caa
 	return p
 }
@@ -129,7 +128,7 @@ func (p *Session) Valid() (bool, error) {
 			return false, err
 		}
 
-		cp := compandauth.Counter(c)
+		cp := Counter(c)
 
 		valid := cp.IsValid(p.GetCliams().CAA, int64(p.opts.MaxActive))
 		if !valid {
@@ -144,7 +143,7 @@ func (p *Session) Valid() (bool, error) {
 		return false, err
 	}
 
-	cp := compandauth.Timeout(c)
+	cp := Timeout(c)
 
 	valid := cp.IsValid(p.GetCliams().CAA, int64(p.opts.MaxAge)*86400)
 	if !valid {
@@ -166,7 +165,7 @@ func (p *Session) SignedString() (string, error) {
 			return "", err
 		}
 
-		cp := compandauth.Counter(c)
+		cp := Counter(c)
 		// @note 并发登陆的时候，可能会出现多个sessionCAA一样的情况，机率很小
 		p.GetCliams().SetCAA(cp.Issue())
 
@@ -180,7 +179,7 @@ func (p *Session) SignedString() (string, error) {
 			return "", err
 		}
 
-		cp := compandauth.Timeout(c)
+		cp := Timeout(c)
 
 		// 是否首次分配
 		hasFirstIssued := !cp.HasIssued()
@@ -189,7 +188,7 @@ func (p *Session) SignedString() (string, error) {
 
 		if hasFirstIssued && p.opts.MinNight.True() {
 			t := time.Unix(int64(issueUnix), 0)
-			issueUnix = compandauth.SessionCAA(MinNight(t).Unix())
+			issueUnix = SessionCAA(MinNight(t).Unix())
 		}
 
 		// timout 首次分配时更新就行
@@ -237,7 +236,7 @@ func (p *Session) Flush() error {
 			return err
 		}
 
-		cp := compandauth.Counter(c)
+		cp := Counter(c)
 
 		// timout 没有分配说明没有登陆过
 		if !cp.HasIssued() {
@@ -256,7 +255,7 @@ func (p *Session) Flush() error {
 			return err
 		}
 
-		cp := compandauth.Timeout(c)
+		cp := Timeout(c)
 
 		// timout 没有分配说明没有登陆过
 		if !cp.HasIssued() {
