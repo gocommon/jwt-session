@@ -17,11 +17,11 @@ type Author struct {
 
 // SessionClaims SessionClaims
 type SessionClaims struct {
-	Author  Author
-	CAAType CAAType
-	CAA     SessionCAA             // 记录有效用户序号
-	Verify  map[string]interface{} // 验证数据，默认存ip,host
-	Data    map[string]interface{} // 用户自定义数据
+	Author  Author                 `json:"author"`
+	CAAType CAAType                `json:"caa_type"`
+	CAA     SessionCAA             `json:"caa"`    // 记录有效用户序号
+	Verify  map[string]interface{} `json:"verify"` // 验证数据，默认存ip,host
+	Data    map[string]interface{} `json:"data"`   // 用户自定义数据
 	jwt.StandardClaims
 }
 
