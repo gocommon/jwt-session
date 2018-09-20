@@ -10,8 +10,9 @@ import (
 
 // Author Author
 type Author struct {
-	ID   int64
-	Name string
+	ID     int64  `json:"id"`
+	Name   string `json:"name"`
+	Avator string `json:"avator"`
 }
 
 // SessionClaims SessionClaims
