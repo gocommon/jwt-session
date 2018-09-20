@@ -246,10 +246,9 @@ func (p *Session) Flush() error {
 
 		cp.Revoke(int64(p.opts.MaxActive))
 
-		defer func() {
-			// counter， 要更新store
-			err = p.store.SetCounter(p.Author().ID, int64(cp))
-		}()
+		// counter， 要更新store
+		err = p.store.SetCounter(p.Author().ID, int64(cp))
+
 	} else {
 		c, err := p.store.GetTimeout(p.Author().ID)
 		if err != nil {
@@ -262,6 +261,9 @@ func (p *Session) Flush() error {
 		if !cp.HasIssued() {
 			return err
 		}
+
+		// counter， 要更新store
+		err = p.store.SetTimeout(p.Author().ID, int64(cp))
 
 	}
 
